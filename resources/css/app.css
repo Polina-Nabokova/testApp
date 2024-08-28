@@ -1,0 +1,38 @@
+label>span {
+    color: red;
+}
+.even-grid-col {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    background-color: rgba(112.520718, 44.062154, 249.437846, .15);
+    border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+}
+.odd-grid-col {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    background-color: white;
+    border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+}
+#image-preview {
+    height:70px;
+    width: 70px;
+    border: 1px dashed darkgray;
+}
+#image-preview img {
+    height:68px;
+    width: 68px;
+}
+.choose-wrap{
+    position:relative;
+    cursor:pointer;
+}
+.choose-wrap svg{
+    position:absolute;
+    width: 20px;
+    top: 22px;
+    left: 40px;
+    fill: #0062cc;
+}
+#photo {
+    display: none;
+}
