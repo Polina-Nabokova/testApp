@@ -9,55 +9,66 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller {
 
-    public function create(UserRequest $request) {
-        if($request->has('photo')) {
-            $user = new Users();
-            $user->name = $request->input('name');
-            $user->email = $request->input('email');
-            $user->phone = $request->input('phone');
-            $user->position_id = $request->input('position_id');
-
-            $photoName = time().'.'.$request->image->extension();
-            $request->image->move(public_path('images'), $photoName);
-
-            $user->photo = 'images/'.$photoName;
-            $user->save();
-
-        } else {
-            return redirect()->route('users')->with('error', 'User hasn"t been created, please try later');
-        }
-       return redirect()->route('users')->with('success', 'User has been created');
+    /**
+     * Create new user
+     * @param UserRequest $request
+     * @return success message
+     */
+    public function create(UserRequest $request) { 
+        $user = new Users();
+        $userData = $request->except('_token', 'photo');       
+        $userData['photo'] = $user->uploadImage($request->photo);       
+        $user->create($userData);
+        
+        return redirect()->route('users-list')->with('success', 'User has been created');
     }
-
-    public function edit($id, Request $request) {
-        $users = new Users();
-        $user = $users->find($id);
-        if($user) {
-            return view('user_form_edit', [
-                'user_data' => $user,
-                'positions' => DB::table('positions')->get()
-            ]);
-        }
-
-        return redirect('/users');
-    }
-
-    public function update(UserUpdateRequest $request) {
-        return redirect()->back()->with('success', 'User has been updated');
-    }
-
-    public function delete($id) {
-        //User::delete($id);
-        return redirect()->back()->with('success', 'User has been deleted');
-    }
-
-
+    
+    /**
+     * Return all users
+     * @param Request $request
+     * @return type
+     */
     public function getAll(Request $request) {
         $page = $request->has('page') ? $request->integer('page') : 1;
-        $count = $request->has('count') ? $request->integer('count') : 6;         
+        $count = $request->has('count') ? $request->integer('count') : 6; 
+        $users = (new Users())->getAll($count, $page);
+        $users->appends(['count' => $count]);
         return view('users', [
-            'users' => (new Users())->getAll($count, $page)
+            'users' => $users,
+            'count' => $count
         ]);
     }
-
+    
+    /**
+     * Create default users 
+     * @return type
+     */
+    public function import() {
+        ini_set('max_execution_time', 180); //3 minutes
+        Users::factory()->count(1)->create();
+        return redirect()->route('users-list')->with('success', 'Users has been created');
+    }
+    
+    
+     public function loadMore(Request $request) {
+        $page = $request->integer('page');
+        $count = $request->integer('count'); 
+        $users = (new Users())->getAll($count , $page);
+                
+        $html = '';
+        if($users->isNotEmpty()) {
+            foreach($users as $key => $user) {
+                $html .= view('includes.users', [
+                    'user'  => $user,
+                    'index' => ($count * ($users->currentPage() - 1)) + $key + 1
+                ])->render();
+            }
+        }
+        $count_show = ($count * ($users->currentPage() - 1)) + count($users);
+        return [
+            'html'     => $html,
+            'lastPage' => $users->lastPage(),
+            'show'     => $count_show
+        ];
+    }    
 }

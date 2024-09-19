@@ -5,46 +5,83 @@
 @include('header')
 
 <div class="container">
-    @if($users)
-        <div class="row">
-            <div class="col-8"><h2 class="mt-4">All users</h2></div>
-            <div class="col-4 text-right">
-                <a href="{{ route('create-form') }}" class="btn btn-success mt-4">Add new</a>
-            </div>
+    @if($users->total())
+        <div class="mt-1 mb-3 ">
+            <span class="h3 align-top">All users</span>
+            <span class="align-bottom"><a href="{{ route('users-create-form') }}" class="btn btn-success w-auto">Add new</a></span>
         </div>
-
-        <div class="row text-center">
-            <div class="col-2 even-grid-col">Name</div>
-            <div class="col-2 even-grid-col">Phone</div>
-            <div class="col-2 even-grid-col">Email</div>
-            <div class="col-2 even-grid-col">Position</div>
-            <div class="col-2 even-grid-col">Photo</div>
-            <div class="col-2 even-grid-col">Action</div>
-        </div>
-    @foreach($users as $user)
-            <div class="row  text-center">
-                <div class="col-2 odd-grid-col">{{ $user->name }}</div>
-                <div class="col-2 odd-grid-col">{{ $user->phone }}</div>
-                <div class="col-2 odd-grid-col">{{ $user->email }}</div>
-                <div class="col-2 odd-grid-col">{{ $user->position }}</div>
-                <div class="col-2 odd-grid-col">
-                    <img src="{{ asset($user->photo) }}" >
-                </div>
-                <div class="col-2 odd-grid-col">Edit/Delete</div>
-            </div>
-    @endforeach
-    {{ $users->links()}}
+        <table id="user-list-table">
+            <thead>
+                <tr>
+                    <th class="even-grid-col text-center">№</th>
+                    <th class="even-grid-col">Name</th>
+                    <th class="even-grid-col">Email</th>
+                    <th class="even-grid-col">Phone</th>
+                    <th class="even-grid-col">Position</th>
+                    <th class="even-grid-col text-center">Photo</th>
+                </tr> 
+            </thead>
+            <tbody>               
+                @foreach($users as $key => $user)
+                    @include('includes.users', ['index' => ($count * ($users->currentPage() - 1)) + $key + 1])
+                @endforeach
+            </tbody>
+        </table>
+    <span class="show-pages-count">Showing <span>{{$count}}</span> of {{$users->total()}}</span>
+    <div class="container mt-3 mb-5 text-center">
+        @if($users->hasMorePages())
+            <button class="btn btn-primary load-more" data-count="{{ $count}}" data-page="{{ $users->currentPage() +1}}">Show more</button>
+            <img src="/images/loading.gif" class="preloader-img"> 
+        @endif
+    </div>
+<!--    <div class="container mt-3 pagination-wrap">
+        
+         {{ $users->links()}}
+    </div>     -->
+   
     @else
-        <div class="row">
-            @include('user_generate')
-            <div class="col-lg-6">
+         <div class="row mt-1">
+            
+            <div class="col-lg-5">
                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                    <a href="{{ route('create-form') }}" class="btn btn-success mt-4 btn-lg">Add one</a>
+                    <a href="{{ route('users-create-form') }}" class="btn btn-success btn-lg">Add one</a>
                 </div>
             </div>
+            <div class="col-lg-1"> <p class="p-2">OR</p></div>
+           
+            @include('user_generate')            
         </div>
     @endif
 
-</div>
-@endsection
+</div>   
+    <script type="module">
+        $(document).ready(function() {
+            $(document).on('click', '.load-more', function(e) {
+                e.preventDefault();
+                var but = $(this);
+                but.next('.preloader-img').css('display','inline-block');
+                var count = $(this).attr('data-count');
+                var page = $(this).attr('data-page');
 
+                $.ajax({
+                    type: 'get',
+                    url: "{{ route('load-users') }}",
+                    data: { 'count': count, 'page': page },
+                    success:function(response) {
+                        $('#user-list-table').append(response.html);
+                        but.next('.preloader-img').css('display','none');
+                        $('.show-pages-count span').text(response.show);
+                        if(page < response.lastPage) {
+                            $('.load-more').attr('data-page', parseInt(page) + 1);
+                        } else {
+                            $('.load-more').remove();
+                        }
+                        // lazyBox();
+                    }
+                });
+            });
+        })
+    </script>
+
+@endsection
+ 

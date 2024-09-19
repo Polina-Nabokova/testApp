@@ -20,15 +20,7 @@ class UserRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array {
-        return [
-            'name'        => 'required|min:2|max:60',
-            'email'       => 'required|email:rfc|unique:users,email',
-            'phone'       => 'required|starts_with:+380|regex:/^[\+]{0,1}380([0-9]{9})$/|unique:users,phone',
-            'position_id' => 'required',
-            'photo'       => 'required|image|max:5000',
-            'page'        => 'integer|min:1',
-            'count'       => 'integer|min:1'            
-        ];
+        return \App\Models\Users::getValidationRules();
     }
 
     /**
@@ -39,6 +31,8 @@ class UserRequest extends FormRequest
     public function attributes(): array {
         return [
             'position_id' => 'position',
+            'phone' => 'mobile phone',
+            'photo' => 'user photo',
         ];
     }
 

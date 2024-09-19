@@ -30,9 +30,59 @@ label>span {
     position:absolute;
     width: 20px;
     top: 22px;
-    left: 40px;
+    left: 35px;
     fill: #0062cc;
 }
 #photo {
     display: none;
+}
+.opblock{
+    border-radius: 3px;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .1);
+}
+
+ .opblock-post {
+    background: #49cc90;
+}
+.opblock-get  {
+    background: #61affe;
+}
+.container table {
+    min-width: 100%;
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+}
+.container table thead {
+    text-transform: uppercase;
+}
+.container table  td, .container table  th {
+    font-weight: 400;
+    padding-right: 15px;
+    padding-left: 15px;
+    text-transform: capitalize;
+}
+.pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preloader-img {
+    display: none;
+    width: 30px;
+    height: 30px;    
+    margin-top: 8px;
+    margin-left: 15px;
+}
+.select-btn {
+    position: absolute;
+    bottom: 5px;
+    left: 2px;
+    font-size: 14px;
 }
