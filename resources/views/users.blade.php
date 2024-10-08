@@ -27,7 +27,7 @@
                 @endforeach
             </tbody>
         </table>
-    <span class="show-pages-count">Showing <span>{{$count}}</span> of {{$users->total()}}</span>
+    <span class="show-pages-count">Showing <span>{{$shown}}</span> of {{$users->total()}}</span>
     <div class="container mt-3 mb-5 text-center">
         @if($users->hasMorePages())
             <button class="btn btn-primary load-more" data-count="{{ $count}}" data-page="{{ $users->currentPage() +1}}">Show more</button>
@@ -70,7 +70,7 @@
                     success:function(response) {
                         $('#user-list-table').append(response.html);
                         but.next('.preloader-img').css('display','none');
-                        $('.show-pages-count span').text(response.show);
+                        $('.show-pages-count span').text(response.shown);
                         if(page < response.lastPage) {
                             $('.load-more').attr('data-page', parseInt(page) + 1);
                         } else {

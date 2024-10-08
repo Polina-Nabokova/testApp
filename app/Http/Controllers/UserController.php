@@ -35,7 +35,8 @@ class UserController extends Controller {
         $users->appends(['count' => $count]);
         return view('users', [
             'users' => $users,
-            'count' => $count
+            'count' => $count,
+            'shown'     => ($count * ($users->currentPage() - 1)) + count($users)
         ]);
     }
     
@@ -45,7 +46,7 @@ class UserController extends Controller {
      */
     public function import() {
         ini_set('max_execution_time', 180); //3 minutes
-        Users::factory()->count(1)->create();
+        Users::factory()->count(45)->create();
         return redirect()->route('users-list')->with('success', 'Users has been created');
     }
     
@@ -64,11 +65,11 @@ class UserController extends Controller {
                 ])->render();
             }
         }
-        $count_show = ($count * ($users->currentPage() - 1)) + count($users);
+        $count_shown = ($count * ($users->currentPage() - 1)) + count($users);
         return [
             'html'     => $html,
             'lastPage' => $users->lastPage(),
-            'show'     => $count_show
+            'shown'    => $count_shown
         ];
     }    
 }
