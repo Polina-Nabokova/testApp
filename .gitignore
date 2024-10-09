@@ -19,3 +19,5 @@ yarn-error.log
 /.idea
 /.vscode
 /nbproject/private/
+/public/images/tmp
+/public/images/users

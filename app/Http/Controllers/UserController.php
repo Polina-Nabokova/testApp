@@ -46,7 +46,7 @@ class UserController extends Controller {
      */
     public function import() {
         ini_set('max_execution_time', 180); //3 minutes
-        Users::factory()->count(45)->create();
+        Users::factory()->count(1)->create();
         return redirect()->route('users-list')->with('success', 'Users has been created');
     }
     
