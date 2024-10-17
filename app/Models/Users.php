@@ -55,7 +55,8 @@ class Users extends Authenticatable {
             file_put_contents($tmp_folder.'/tmp.jpg', $image); 
             $image = $tmp_folder.'/tmp.jpg';
         }
-        $photoName = time().'.jpg';       
+        
+        $photoName = str()->random(20).'.jpg';       
         $img = Image::make($image);
         $img->fit(70, 70); // crop and resize to 70x70 pixel
         if($img->extension != 'jpg' || $img->extension != 'jpeg'){
