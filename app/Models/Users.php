@@ -13,7 +13,9 @@ class Users extends Authenticatable {
     
     // don't use default fields created_at, updatet_at 
     public $timestamps = false;
-    
+    protected static $tiny_api_key = "ThXWgv1kBLpN3jhdzDnrF6kfX7dwBms7";
+
+
     protected $fillable = [
         'name', 
         'email',
@@ -43,13 +45,25 @@ class Users extends Authenticatable {
      * @param  object $image request file
      * @return string localPath
      */
-    public function uploadImage($image){
-        $photoName = time().'.'.$image->extension();        
+    public static function uploadImage($image, $is_string_data = false){
+        $tmp_folder = public_path('images/tmp');
+        if(!file_exists($tmp_folder)) {
+            mkdir("images/tmp", 0755);
+            mkdir("images/users", 0755);
+        }
+        if($is_string_data) {            
+            file_put_contents($tmp_folder.'/tmp.jpg', $image); 
+            $image = $tmp_folder.'/tmp.jpg';
+        }
+        $photoName = time().'.jpg';       
         $img = Image::make($image);
         $img->fit(70, 70); // crop and resize to 70x70 pixel
-        $img->save(public_path('images\tmp\/') . $photoName);
-        $this->compressImage($photoName); // optimaze image
-     
+        if($img->extension != 'jpg' || $img->extension != 'jpeg'){
+          $img->encode('jpg');  // for auto generated users
+        }
+        $img->save($tmp_folder .'/'. $photoName);
+        $is_image = self::compressImage($photoName); // optimaze image
+        if(!$is_image) return '';
         return 'images/users/' . $photoName;
     }
 
@@ -58,13 +72,16 @@ class Users extends Authenticatable {
      * @param string $image name of image
      */
     public static function compressImage($image) {
-        \Tinify\setKey(env('TINY_API_KEY'));
+        \Tinify\setKey(self::$tiny_api_key);
        
-        $tmp_file = public_path('images\tmp\/') . $image;
-        $users_file = public_path('images\users\/'). $image;
+        $tmp_file = public_path('images/tmp/') . $image;
+        $users_file = public_path('images/users/'). $image;
+        if (!is_file($tmp_file)) return false;
         $source = \Tinify\fromFile($tmp_file);
         $source->toFile($users_file);
         unlink($tmp_file);
+        @unlink(public_path('images/tmp/').'tmp.jpg');
+        return true;
     }  
     
     public static function getValidationRules() {

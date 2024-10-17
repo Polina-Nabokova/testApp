@@ -26,14 +26,16 @@ class UsersFactory extends Factory
     {       
         $localisedFaker = Faker\Factory::create("uk_UA");     
         $name = fake()->firstName();
-        $image = fake()->image( public_path('images\tmp'), 70, 70, '', false, true,'photo', false, 'jpeg');
-        Users::compressImage($image);
-        $image = 'images/users/'. $image;       
+     
+        $rand_image = "https://picsum.photos/70"; // Lorem Picsum api
+        $image_source = file_get_contents($rand_image);
+        if(!$image_source) $image_source = file_get_contents("public/images/default_user_photo.jpeg");
+    
         return [
             'name'        => $name,
             'email'       => strtolower($name .'.' . fake()->unique()->lastName()) .'@'. fake()->safeEmailDomain(),      
             'phone'       => $localisedFaker->unique()->e164PhoneNumber(),        
-            'photo'       => $image,
+            'photo'       => Users::uploadImage($image_source, true),
             'position_id' => fake()->randomElement(DB::table('positions')->pluck('id'))                       
         ];
         

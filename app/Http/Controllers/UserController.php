@@ -16,8 +16,12 @@ class UserController extends Controller {
      */
     public function create(UserRequest $request) { 
         $user = new Users();
-        $userData = $request->except('_token', 'photo');       
-        $userData['photo'] = $user->uploadImage($request->photo);       
+        $userData = $request->except('_token', 'photo');  
+        $upload_photo = $user::uploadImage($request->photo); 
+        if($upload_photo === ''){
+           return redirect()->route('users-list')->with('error', "User hasn't been created");
+        } 
+        $userData['photo'] = $upload_photo ; 
         $user->create($userData);
         
         return redirect()->route('users-list')->with('success', 'User has been created');
@@ -36,7 +40,7 @@ class UserController extends Controller {
         return view('users', [
             'users' => $users,
             'count' => $count,
-            'shown'     => ($count * ($users->currentPage() - 1)) + count($users)
+            'shown' => ($count * ($users->currentPage() - 1)) + count($users)
         ]);
     }
     
@@ -46,7 +50,7 @@ class UserController extends Controller {
      */
     public function import() {
         ini_set('max_execution_time', 180); //3 minutes
-        Users::factory()->count(1)->create();
+        Users::factory()->count(45)->create();
         return redirect()->route('users-list')->with('success', 'Users has been created');
     }
     
