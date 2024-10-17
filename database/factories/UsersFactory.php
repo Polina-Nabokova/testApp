@@ -22,11 +22,9 @@ class UsersFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
-    {       
+    public function definition(): array {       
         $localisedFaker = Faker\Factory::create("uk_UA");     
         $name = fake()->firstName();
-     
         $rand_image = "https://picsum.photos/70"; // Lorem Picsum api
         $image_source = file_get_contents($rand_image);
         if(!$image_source) $image_source = file_get_contents("public/images/default_user_photo.jpeg");
